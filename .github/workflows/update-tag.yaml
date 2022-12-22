@@ -1,0 +1,48 @@
+name: Update Tag
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  update-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Get Version
+        id: get_version
+        uses: battila7/get-version-action@v2
+
+      - run: echo ${{ steps.get_version.outputs.version-without-v }}
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+
+      - name: Install Prerequisite
+        run: pip install atlassian-python-api
+
+      - name: Install pandas  
+        run: pip install pandas
+
+      - name: Install lxml
+        run: pip install lxml
+
+      - name: Check out my other private repo
+        uses: actions/checkout@main
+        with:
+          repository: massmutual/swift-svm-confluence
+          token: ${{ secrets.my_pat }}
+          path: ./confluence_update
+
+      - name: Update Confluence page
+        run: python3 swift-release.py -user ${{ secrets.user }} -token ${{ secrets.token }} -repo_name ${{ github.event.repository.name }} -tag ${{ steps.get_version.outputs.version-without-v }}
+        working-directory: ./confluence_update
+
+### Repo Name: Created by event in github action
+### Tag: output of step with id: tag
+### Save PAT (my_pat), confluence token and username in repository secrets
