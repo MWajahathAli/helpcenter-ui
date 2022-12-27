@@ -1,0 +1,68 @@
+name: Bump version
+on:
+  pull_request:
+    types:
+      - closed
+    paths-ignore:
+      - '.github/**'
+      - '.snyk.d/**'
+      - 'CI.yml'
+      - '*.md'
+      - 'deploy/**'
+  push:
+    branches-ignore:
+      - main
+      - develop
+    paths-ignore:
+      - '.github/**'
+      - '.snyk.d/**'
+      - 'CI.yml'
+      - '*.md'
+      - 'deploy/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: '0'
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    - name: Bump version and push tag for main branch
+      uses: massmutual/swift-github-tag-action@2.2.7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO_OWNER: "Cloud Platform Engineering"
+      # if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' }}
+      if: ${{ github.event.pull_request.merged == true && github.base_ref == 'main' && github.head_ref == 'develop' }}
+    - name: Bump version and push tag for develop branch
+      uses: massmutual/swift-github-tag-action@2.2.7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO_OWNER: "Cloud Platform Engineering"
+      # if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' }}
+      if: ${{ github.event.pull_request.merged == true && github.base_ref == 'develop' }}
+    
+    - name: Delete tags for feature branches when code merged to develop
+      if: ${{ github.event.pull_request.merged == true && github.base_ref == 'develop' }}
+      shell: bash
+      run: |
+        source_branch="${{ github.head_ref }}"
+        echo "Source branch is : $source_branch"
+        tag="feature-$source_branch"
+        echo "Tag to search is : $tag"
+        tagnames="$(git tag | grep -E "^v?[0-9]+\.[0-9]+\.[0-9]+(-"$tag"\.[0-9]+)$" )"
+        echo "Tags are: $tagnames"
+        for i in $tagnames;
+        do
+          git push --delete origin refs/tags/"$i"
+        done
+    - name: Bump version and push tag for feature branches
+      uses: massmutual/swift-github-tag-action@2.2.7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO_OWNER: "Cloud Platform Engineering"
+        PRERELEASE_SUFFIX: feature-${{ steps.extract_branch.outputs.branch }}
+      if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' && github.base_ref != 'main' && github.base_ref != 'develop' }}

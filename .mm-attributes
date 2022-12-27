@@ -1,17 +1,17 @@
 # MassMutual Repo attributes file, must be at repo root, named .mm-attributes 
-version: v1.0.0
+version: v3.0.0
 #
 # application and team attributes
 application-attributes:
 
   escalation-email: "CloudPlatformEngineering@massmutual.onmicrosoft.com"
   app-group: "cpe-swift"
-  app: "swift-template-repo"
-  component: "Template"
+  app: "Swift-template-nodejs-app"
+  component: "template-nodejs-app"
   type: "web"
   sdlc-phase: "active"
   user-base: "internal"
-  notes: "Template repo for when new Swift release repos are created"
+  notes: "sample application used within CI/CD examples"
 
 devops-attributes:
 
@@ -34,8 +34,10 @@ organization-attributes:
 # tags required for all cloud resources
 cloud-tags:
 
-  appid: ""
-  app: "Swift-metrics"
+  appid: "Swift-template-nodejs-app"
+  app: ""
   tcode: "T-07427-001"
   support-owner: "CloudPlatformEngineering@massmutual.onmicrosoft.com"
   security_classification: "C"
+
+

@@ -1,0 +1,193 @@
+# Default values from helm chart
+# https://github.com/massmutual/swift-helm-charts/blob/main/charts/mmkubeapps/values.yaml
+
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Deployment type.
+bluegreen:
+    enabled: false
+    
+green:
+  enabled: true
+
+blue:
+  enabled: true
+
+productionSlot: green
+
+replicaCount: 3
+minReadySeconds: 35
+
+nameOverride: "hello-world1"
+fullnameOverride: "hello-world1"
+
+container:
+  port: 3000
+  path: /greeting
+
+service:
+  type: ClusterIP
+  port: 3000
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 0
+
+securityContext:
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  runAsUser: 0
+  runAsGroup: 0
+
+## Configure extra options for containers' liveness and readiness probes
+## Configure extra options for Apache server containers' liveness, readiness and startup probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
+## @param startupProbe.enabled Enable startupProbe
+## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+## @param startupProbe.periodSeconds Period seconds for startupProbe
+## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
+## @param startupProbe.failureThreshold Failure threshold for startupProbe
+## @param startupProbe.successThreshold Success threshold for startupProbe
+##
+startupProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+## @param livenessProbe.enabled Enable liveness probe
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+##
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+## @param readinessProbe.enabled Enable readiness probe
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+##
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+## @param customStartupProbe Custom liveness probe for the Web component
+##
+customStartupProbe: {}
+## @param customLivenessProbe Custom liveness probe for the Web component
+##
+customLivenessProbe: {}
+## @param customReadinessProbe Custom rediness probe for the Web component
+##
+customReadinessProbe: {}
+## @param extraVolumes Array to add extra volumes (evaluated as a template)
+##
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "alb"
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: subnet-020bf6195b3e06594, subnet-02cc4626923169e62, subnet-0ae45319a6f299af9
+    external-dns.alpha.kubernetes.io/hostname: alpineattlz.nsawsprd.massmutual.com
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:580834068142:certificate/53a5d21c-12f8-4cb6-91a9-4b071eb7c1f3
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/healthcheck-path: /greeting
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+
+  hosts:
+    - host: ingress.local
+      paths:
+        - path: /
+          pathType: Prefix
+          
+  hostsproduction:
+    - host: production.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+  hostsstage:
+    - host: stage.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # If existing service account from the same namespace needs to be used, set create to false and provide the name of the serviceAccount
+  # Annotations to add to the service account
+  annotations: {}
+    # Enable annotations and add the below annotation to use IRSA
+    # eks.amazonaws.com/role-arn: arn:aws:iam::xxxxxxxxxxxxxx:role/eks-irsa-role
+    # Note: The name of the service account should match with the service account used in the IAM role trust relatioship
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+secretsmanager:
+  enabled: false
+env:
+  normal:    
+    # env1: "value1"
+    # env2: "value2"
+  secret:
+    # secret-name-from-secret-manager1:
+    #   key:
+    #     - envName1
+    #     - envName2
+    # secret-name-from-secret-manager2:
+    #   key:
+    #     - envName1
+    #     - envName2

@@ -13,7 +13,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
-
+      
       - name: Get Version
         id: get_version
         uses: battila7/get-version-action@v2
@@ -25,13 +25,13 @@ jobs:
 
       - name: Install Prerequisite
         run: pip install atlassian-python-api
-
+        
       - name: Install pandas  
         run: pip install pandas
 
       - name: Install lxml
         run: pip install lxml
-
+      
       - name: Check out my other private repo
         uses: actions/checkout@main
         with:

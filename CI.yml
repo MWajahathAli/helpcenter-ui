@@ -1,0 +1,117 @@
+# This YAML file is the inputs for the nodejs pipeline to build the images and deploy the apps
+# to target environment (Sandbox/Dev/Nonprod/Prod) AWS kubernetes EKS cluster
+# Security features
+security:
+  # Enable linting of Dockerfile using hadolint. If lint encounters error, the pipeline will stop
+  enable_lint: "false"
+  # Enable build time and pre-deployment image scan of the docker image using SNYK. If SNYK encounters vulnerabilities, the pipeline will stop
+  enable_snyk: "true"
+
+###### Overriding the default swift helm chart , use one of the option 1,2 or 3#######
+# helm_override:
+  # ### 1. Use Private helm chart from Jfrog Artifactory ####
+  # enabled: 'true'   #true/false - depending on this value will override the use of default helm charts, if this value is false helm_override is not used
+  # chart_repo: 'https://artifactory.awsmgmt.massmutual.com/artifactory/daas-swift-helm-local/'  #Provide JFrog artifactory path of your helm chart packages
+  # chart_version: '0.1.23' #The version of the chart
+  # chart_app: 'mmkubeapps' #The name of chart
+  # chart_private: 'true'  #Provide always "true", The helm chart repo is private
+  # chart_local_path: '' #Keep the value empty under this option
+
+  # ### 2. Use Public helm chart from github pages ###
+  # enabled: 'true'   #true/false - depending on this value will override the use of default helm charts, if this value is false helm_override is not used
+  # chart_repo: 'https://massmutual.github.io/swift-helm-charts/'  #Provide github pages url or url which can access without credentials of your helm chart packages
+  # chart_version: '0.1.23' #The version of the chart
+  # chart_app: 'mmkubeapps' #The name of chart
+  # chart_private: 'false'  #Provide always "false", The helm chart repo is public
+  # chart_local_path: '' #Keep the value empty under this option
+
+  # ### 3. Use Local helm chart stores under same App repo ###
+  # enabled: 'true'   #true/false - depending on this value will override the use of default helm charts, if this value is false helm_override is not used
+  # chart_repo: 'local'  #use 'local' and store helm chart packages under the same App repo
+  # chart_version: '0.1.23' #The version of the chart
+  # chart_app: 'mmkubeapps' #The name of chart
+  # chart_private: 'true'  #Provide always "true", The helm chart repo is private
+  # chart_local_path: 'charts' #Path to the chart in case charts are stored under the same App repo, example it must be in this path <template-app-repo>/charts/mmkubeapps/Chart.yaml 
+
+# Build the image name
+image:
+  image_name: "hello-world"
+
+# Build the image with extra arguments, if enabled is true it will append the args value to the build paramter
+buildargs:
+    enabled: "false"
+    args: "--build-arg commitid=adffedb44545c --build-arg shortcommitid=adffe"
+
+# Performs unit test by loading and executing unittest.groovy file in Jenkinsfile 
+# Note - unitTest() must exist in provided groovy scipt file, as this method being called to run unittests
+unittest:
+    enabled: "true"
+    groovy_file: unittest.groovy
+
+# Validate expected page and content of the page. 
+# context_path: for value "/greeting" expected page will be http://url/greeting
+# response_page_contains: provided string in the context_path page
+url:
+  container_port: "3000"
+  context_path: "/greeting"
+  response_page_contains: "Hello World"
+
+# Name of AWS EKS cluster which is used in pipeline for deployment
+# Kubernetes namespace will be app_name
+environment:
+  sandbox:
+    kubernetes:
+      cluster_name: "eks1-alpine-snd"
+      region: "us-east-1"
+      app_name: "hello-world1-snd"
+      app_namespace: "hello-world-snd"
+      image_tag: "2.0.2"
+      config_map: true # true or false
+  dev:
+    kubernetes:
+      cluster_name: "eks1-alpineattlz-dev"
+      region: "us-east-1"
+      app_name: "hello-world1-dev"
+      app_namespace: "hello-world-dev"
+      image_tag: "2.0.0"
+      config_map: false # true or false
+  nonprod:
+    kubernetes:
+      cluster_name: "eks2-alpmgmt-prd"
+      region: "us-east-1"
+      app_name: "hello-world1-nonprd"
+      app_namespace: "hello-world-nonprd"
+      image_tag: "2.0.0"
+      config_map: false # true or false
+  prod:
+    kubernetes:
+      cluster_name: "eks1-alpineattlz-prd"
+      region: "us-east-1"
+      app_name: "hello-world1"
+      app_namespace: "hello-world"
+      image_tag: "1.1.0"
+      config_map: false # true or false
+
+# Slack Notification during build and deployments
+slack:
+  slack_channel: "swift-pipeline-notification"
+
+artifactory:
+  # Use Jfrog Artifactory option to store docker images
+  jfrog_artifactory: 'artifactory.awsmgmt.massmutual.com/daas-swift-docker'
+  aws_ecr_registry: ''
+  swift_artifactory_user: 'fim-artifactory-daas-swift-rw-token'
+
+  # To use AWS ECR option to store docker images, comment Jfrog Artifactory option and uncomment below lines
+  # aws_ecr_registry: "590360573099.dkr.ecr.us-east-1.amazonaws.com"
+  # aws_ecr_region: "us-east-1"            
+  # jfrog_artifactory: '' 
+  
+#To retrive secret from vault for artifactory authentication
+#secret_path        = Vault Key Path.
+#vaultkey           = Vault Key Name.
+vault:   
+    secret_path         : 'cpe/dev/artifactory'
+    vault_key            : 'swift-artifactory-token'
+
+
