@@ -155,7 +155,7 @@ pipeline
             }
         } 
 
-        // This stage perform unitTest nodejs app
+        // This stage perform unitTest reactjs app
         stage("Perform unit test"){
             when {
                 allOf {
@@ -177,8 +177,8 @@ pipeline
             }
         }     
 
-        //This stage will build nodejs
-        stage("Nodejs Build and Package"){
+        //This stage will build reactjs
+        stage("reactjs Build and Package"){
             when {
                 allOf {
                     environment name: 'ROLLBACK', value: 'false'
@@ -189,7 +189,7 @@ pipeline
                 script {
                     timestamps {                                      
                         ansiColor {
-                            utils.printBold("Nodejs Build & Package")                            
+                            utils.printBold("reactjs Build & Package")                            
                             buildServices.buildDockerImage()
                         }
                     }
@@ -304,7 +304,7 @@ pipeline
         }
 
         //This stage will send notification on slack channel once the CI pipeline has been successfully completed
-        stage ('Slack Notification about nodejs app Build') {
+        stage ('Slack Notification about reactjs app Build') {
             when {
                 allOf {
                     environment name: 'ROLLBACK', value: 'false'
@@ -315,8 +315,8 @@ pipeline
                script {
                     timestamps {                                      
                         ansiColor {
-                        utils.printSuccess("nodejs app build has been done")
-                        msg = "nodejs App CI Pipeline has been successfully completed - Job "
+                        utils.printSuccess("reactjs app build has been done")
+                        msg = "reactjs App CI Pipeline has been successfully completed - Job "
                         //status = "$currentBuild.cuurentResult"
                         String status = currentBuild.result ?: 'SUCCESS'
                         utils.printBold("${status}")
@@ -380,7 +380,7 @@ pipeline
          }
      
         //This stage will send notification on slack channel once the CD pipeline has been successfully completed
-        stage ('Slack Notification about nodejs app deployment') {
+        stage ('Slack Notification about reactjs app deployment') {
             when {
                 anyOf {
                     environment name: 'ROLLBACK', value: 'true'
@@ -391,8 +391,8 @@ pipeline
                 script {
                     timestamps {                                      
                         ansiColor {
-                            utils.printSuccess("NodeJS app deployed to eks successfully")
-                            msg = "$EKS_OPS - NodeJS App CD Pipeline has been successfully completed - Job "
+                            utils.printSuccess("reactjs app deployed to eks successfully")
+                            msg = "$EKS_OPS - reactjs App CD Pipeline has been successfully completed - Job "
                             //status = "$currentBuild.result"
                             String status = currentBuild.result ?: 'SUCCESS'
                             utils.printBold("${status}")

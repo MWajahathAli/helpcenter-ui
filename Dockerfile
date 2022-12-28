@@ -53,7 +53,7 @@ ENV context_path=/
 ENV container_port=8080
 COPY --from=prod /app/build/ ./build
 COPY --from=prod /app/node_modules ./node_modules
-COPY server.js .
+COPY app/server.js .
 
 # start node server
 ENTRYPOINT ["node", "server.js"]
