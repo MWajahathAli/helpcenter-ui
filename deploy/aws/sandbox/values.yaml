@@ -21,16 +21,16 @@ productionSlot: green
 replicaCount: 3
 minReadySeconds: 35
 
-nameOverride: "hello-world1-snd"
-fullnameOverride: "hello-world1-snd"
+nameOverride: "react-hello-world1-snd"
+fullnameOverride: "react-hello-world1-snd"
 
 container:
-  port: 3000
-  path: /greeting
+  port: 8080
+  path: /
 
 service:
   type: ClusterIP
-  port: 3000
+  port: 8080
 
 podAnnotations: {}
 
@@ -115,7 +115,7 @@ ingress:
     external-dns.alpha.kubernetes.io/hostname: alpine.nsawssnd.massmutual.com
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:590360573099:certificate/c737dc60-afc4-48fc-816e-a0a9fe2d5012
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
-    alb.ingress.kubernetes.io/healthcheck-path: /greeting
+    alb.ingress.kubernetes.io/healthcheck-path: /
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
 
   hosts:
@@ -140,17 +140,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+resources:
+  limits:
+    cpu: 100m
+    memory: 200Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
 
 autoscaling:
   enabled: false

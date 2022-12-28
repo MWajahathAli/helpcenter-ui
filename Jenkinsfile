@@ -1,4 +1,4 @@
-@Library(['swift-libs@4.0.0', 'demo-lib@main']) _
+@Library('swift-libs@5.0.0') _
 import lib.Slack
 import lib.JenkinsUtilities
 
@@ -42,7 +42,7 @@ pipeline
         //Enable chart required credentials to download helm charts
         HELM_CHART_PRIVATE = 'true'
         HELM_CHART_APP = "mmkubeapps"
-        HELM_CHART_VERSION = "0.1.32"
+        HELM_CHART_VERSION = "0.1.33"
         GIT_REPO = "${GIT_URL}"
         BRANCH_NAME = validateParam(env.BRANCH_NAME, "BRANCH_NAME")
         // Template App repo will be cloned under 'appRepo' folder
@@ -133,25 +133,6 @@ pipeline
                 }
             }
         }
-            
-       stage("testing second shared library"){
-            when {
-                allOf {
-                    environment name: 'ROLLBACK', value: 'false'
-                    environment name: 'CI', value: 'true'
-                }
-            }
-            steps{
-                script {
-                    timestamps {                                      
-                        ansiColor {
-                            utils.printBold("Test second shared library")                            
-                            demoService.demofunction()
-                        }
-                    }
-                }
-            }
-        }
 
 
         //This stage will get Image tag
@@ -209,7 +190,7 @@ pipeline
                     timestamps {                                      
                         ansiColor {
                             utils.printBold("Nodejs Build & Package")                            
-                            buildServices.buildNodeJSPackage()
+                            buildServices.buildDockerImage()
                         }
                     }
                 }

@@ -35,7 +35,7 @@ security:
 
 # Build the image name
 image:
-  image_name: "hello-world"
+  image_name: "react-hello-world"
 
 # Build the image with extra arguments, if enabled is true it will append the args value to the build paramter
 buildargs:
@@ -52,9 +52,9 @@ unittest:
 # context_path: for value "/greeting" expected page will be http://url/greeting
 # response_page_contains: provided string in the context_path page
 url:
-  container_port: "3000"
-  context_path: "/greeting"
-  response_page_contains: "Hello World"
+  container_port: "8080"
+  context_path: "/"
+  response_page_contains: "React App"
 
 # Name of AWS EKS cluster which is used in pipeline for deployment
 # Kubernetes namespace will be app_name
@@ -63,32 +63,32 @@ environment:
     kubernetes:
       cluster_name: "eks1-alpine-snd"
       region: "us-east-1"
-      app_name: "hello-world1-snd"
-      app_namespace: "hello-world-snd"
-      image_tag: "2.0.2"
+      app_name: "react-hello-world1-snd"
+      app_namespace: "react-hello-world-snd"
+      image_tag: "1.0.0"
       config_map: true # true or false
   dev:
     kubernetes:
       cluster_name: "eks1-alpineattlz-dev"
       region: "us-east-1"
-      app_name: "hello-world1-dev"
-      app_namespace: "hello-world-dev"
+      app_name: "react-hello-world1-dev"
+      app_namespace: "react-hello-world-dev"
       image_tag: "2.0.0"
       config_map: false # true or false
   nonprod:
     kubernetes:
       cluster_name: "eks2-alpmgmt-prd"
       region: "us-east-1"
-      app_name: "hello-world1-nonprd"
-      app_namespace: "hello-world-nonprd"
+      app_name: "react-hello-world1-nonprd"
+      app_namespace: "react-hello-world-nonprd"
       image_tag: "2.0.0"
       config_map: false # true or false
   prod:
     kubernetes:
       cluster_name: "eks1-alpineattlz-prd"
       region: "us-east-1"
-      app_name: "hello-world1"
-      app_namespace: "hello-world"
+      app_name: "react-hello-world1"
+      app_namespace: "react-hello-world"
       image_tag: "1.1.0"
       config_map: false # true or false
 
