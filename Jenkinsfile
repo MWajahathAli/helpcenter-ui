@@ -113,6 +113,20 @@ pipeline
                 }                
             }
         }
+            
+         //This stage will run a precheck on the repository code
+        stage("Pre Check"){
+            steps{
+                script {
+                    timestamps {                                      
+                        ansiColor {
+                            utils.printBold("Running Pre Check")                            
+                            securityServices.preCheck()
+                        }
+                    }
+                }
+            }
+        }
         //This stage will validate the Dockerfile using Hadolint
         stage("Validate Dockerfile using Hadolint"){
             when {
