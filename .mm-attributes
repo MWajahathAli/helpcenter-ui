@@ -22,6 +22,7 @@ devops-attributes:
   dev-branch: "main"
   includes-iac: "yes"
   iac-tooling: "cdk"
+  pipeline-type: "swift-template-reactjs-app”
 #
 # attributes used during reporting
 organization-attributes: 
