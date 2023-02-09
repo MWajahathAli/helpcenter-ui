@@ -42,7 +42,7 @@ pipeline
         //Enable chart required credentials to download helm charts
         HELM_CHART_PRIVATE = 'true'
         HELM_CHART_APP = "mmkubeapps"
-        HELM_CHART_VERSION = "0.1.33"
+        HELM_CHART_VERSION = "0.1.36"
         GIT_REPO = "${GIT_URL}"
         BRANCH_NAME = validateParam(env.BRANCH_NAME, "BRANCH_NAME")
         // Template App repo will be cloned under 'appRepo' folder
