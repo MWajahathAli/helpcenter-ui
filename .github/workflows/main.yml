@@ -9,6 +9,10 @@ on:
       - 'CI.yml'
       - '*.md'
       - 'deploy/**'
+      - '.dockerignore'
+      - '.mm-attributes'
+      - 'hadolint.yml'
+      - 'Jenkinsfile'
   push:
     branches-ignore:
       - main
@@ -19,6 +23,10 @@ on:
       - 'CI.yml'
       - '*.md'
       - 'deploy/**'
+      - '.dockerignore'
+      - '.mm-attributes'
+      - 'hadolint.yml'
+      - 'Jenkinsfile'
 jobs:
   build:
     runs-on: ubuntu-latest
