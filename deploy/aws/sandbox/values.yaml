@@ -104,22 +104,26 @@ customReadinessProbe: {}
 ##
 ingress:
   enabled: true
-  className: ""
+  # In case of external LB, className would be external-alb. In case of internal LB, className would be alb(default)
+  className: "alb"
   annotations:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: "alb"
+    # In case of external LB, scheme would be internet-facing. In case of internal LB, scheme would be internal(default)
     alb.ingress.kubernetes.io/scheme: internal
     alb.ingress.kubernetes.io/target-type: ip
+    # In case of internal load balancers, the subnets are auto discovered(For Upgarded EKS clusters). However, when using the internet-facing load balancer providing subnets in the below annotation is mandatory.
     alb.ingress.kubernetes.io/subnets: subnet-02588ba8b031a5630, subnet-04310931ebea92d6d, subnet-0b1038e076ce2d45d
-    external-dns.alpha.kubernetes.io/hostname: alpine.nsawssnd.massmutual.com
+    # The DNS name can be provided in the below annotation or under the host section
+    # external-dns.alpha.kubernetes.io/hostname: reactjs-sandbox.alpine.nsawssnd.massmutual.com
+    # When using DNS, certificate ARN can also be auto-discovered.
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:590360573099:certificate/c737dc60-afc4-48fc-816e-a0a9fe2d5012
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/healthcheck-path: /
-    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '443'
 
   hosts:
-    - host: ingress.local
+    - host: reactjs-sandbox.alpine.nsawssnd.massmutual.com
       paths:
         - path: /
           pathType: Prefix
