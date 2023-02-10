@@ -43,6 +43,9 @@ pipeline
         HELM_CHART_PRIVATE = 'true'
         HELM_CHART_APP = "mmkubeapps"
         HELM_CHART_VERSION = "0.1.36"
+        NODE_EXTRA_CA_CERTS = '/root/.pki/tls-ca-bundle.pem'
+        ORG = 'massmutual'
+        //Validate Params
         GIT_REPO = "${GIT_URL}"
         BRANCH_NAME = validateParam(env.BRANCH_NAME, "BRANCH_NAME")
         // Template App repo will be cloned under 'appRepo' folder
@@ -54,7 +57,7 @@ pipeline
     // Stages begin here configured each stage for specific task
     stages {
         //Checkout App Build Repo and Load CI.YML & initiliaze env variables
-        stage('Checkout App Repo'){
+        stage('Read environment specific values'){
             steps {
                 checkout([
                 $class: 'GitSCM',
@@ -76,8 +79,6 @@ pipeline
                         env.CONTAINER_PORT = yaml_data.url.container_port
                         env.CONTEXT_PATH = yaml_data.url.context_path
                         env.RESPONSE_PAGE_CONTAINS = yaml_data.url.response_page_contains
-                        env.SECRET_PATH = yaml_data.vault.secret_path
-                        env.VAULT_KEY = yaml_data.vault.vault_key
                         if (yaml_data.containsKey("buildargs")){
                             env.ARGS_ENABLED = yaml_data.buildargs.enabled                         
                             env.ARGS = yaml_data.buildargs.args
@@ -106,6 +107,25 @@ pipeline
                         } 
                         else {
                             env.UNIT_TEST_ENABLED = "false"                   
+                        }
+                        if (yaml_data.containsKey("vault")){
+                            env.USE_SAAS_VAULT = yaml_data.vault.use_saas_vault
+                            if ("$USE_SAAS_VAULT" == 'yes'){
+                                env.VAULT_URL   = yaml_data.vault.saas_vault_url
+                                env.SECRET_PATH = yaml_data.vault.saas_secret_path
+                                env.VAULT_KEY   = yaml_data.vault.saas_vault_key
+                                utils.printBold("Fetching secrets from SaaS Vault") 
+                            }
+                            else{
+                                env.VAULT_URL   = yaml_data.vault.legacy_vault_url
+                                env.SECRET_PATH = yaml_data.vault.secret_path
+                                env.VAULT_KEY   = yaml_data.vault.vault_key
+                                utils.printBold("Fetching secrets from Legacy Vault") 
+                            }
+                        } 
+                        else {
+                            echo "Vault Parameters are not correct"
+                            exit 1
                         }
                         env.CI_STATUS = 'SUCCESS'
                         }

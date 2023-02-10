@@ -110,8 +110,15 @@ artifactory:
 #To retrive secret from vault for artifactory authentication
 #secret_path        = Vault Key Path.
 #vaultkey           = Vault Key Name.
-vault:   
-    secret_path         : 'cpe/dev/artifactory'
-    vault_key            : 'swift-artifactory-token'
+vault:
+  use_saas_vault: "yes"
+# SaaS Vault Values
+  saas_vault_url: "https://massmutual-prod-us-east-1-private-vault-8f6a23fa.eae4f0a3.z1.hashicorp.cloud:8200/"
+  saas_secret_path: 'cpe/dev/artifactory'
+  saas_vault_key: 'swift-artifactory-token'
+# Legacy Vault Values
+  legacy_vault_url: "https://vault.kube.cxmgmtawsprd.massmutual.com"
+  secret_path: 'secret/alpine/dev/artifactory'
+  vault_key: 'swift-artifactory-token'
 
 
