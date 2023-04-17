@@ -7,12 +7,16 @@ on:
       - '.github/**'
       - '.snyk.d/**'
       - 'CI.yml'
+      - 'CD.yml'
       - '*.md'
       - 'deploy/**'
       - '.dockerignore'
       - '.mm-attributes'
       - 'hadolint.yml'
       - 'Jenkinsfile'
+      - 'PULL_REQUEST_TEMPLATE.md'
+      - 'README.md'
+
   push:
     branches-ignore:
       - main
@@ -21,12 +25,16 @@ on:
       - '.github/**'
       - '.snyk.d/**'
       - 'CI.yml'
+      - 'CD.yml'
       - '*.md'
       - 'deploy/**'
       - '.dockerignore'
       - '.mm-attributes'
       - 'hadolint.yml'
       - 'Jenkinsfile'
+      - 'PULL_REQUEST_TEMPLATE.md'
+      - 'README.md'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -53,20 +61,6 @@ jobs:
       # if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' }}
       if: ${{ github.event.pull_request.merged == true && github.base_ref == 'develop' }}
     
-    - name: Delete tags for feature branches when code merged to develop
-      if: ${{ github.event.pull_request.merged == true && github.base_ref == 'develop' }}
-      shell: bash
-      run: |
-        source_branch="${{ github.head_ref }}"
-        echo "Source branch is : $source_branch"
-        tag="feature-$source_branch"
-        echo "Tag to search is : $tag"
-        tagnames="$(git tag | grep -E "^v?[0-9]+\.[0-9]+\.[0-9]+(-"$tag"\.[0-9]+)$" )"
-        echo "Tags are: $tagnames"
-        for i in $tagnames;
-        do
-          git push --delete origin refs/tags/"$i"
-        done
     - name: Bump version and push tag for feature branches
       uses: massmutual/swift-github-tag-action@2.2.7
       env:
