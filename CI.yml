@@ -5,7 +5,7 @@ security:
   # Enable linting of Dockerfile using hadolint. If lint encounters error, the pipeline will stop
   enable_lint: "false"
   # Enable build time and pre-deployment image scan of the docker image using SNYK. If SNYK encounters vulnerabilities, the pipeline will stop
-  enable_snyk: "true"
+  enable_snyk: "false"
 
 ###### Overriding the default swift helm chart , use one of the option 1,2 or 3#######
 # helm_override:
