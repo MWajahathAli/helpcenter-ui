@@ -7,7 +7,7 @@ def slack = new Slack(this)
 def utils = new JenkinsUtilities(this) 
 
 //Dockers are stored in Jfrog Artifactory for more details about this docker image https://github.com/massmutual/swift-dockers/tree/main/swift-alpine-k8s
-DOCKER_IMAGE = "artifactory.awsmgmt.massmutual.com/daas-swift-docker/swift-alpine-k8s:aws-docker-1.0.2"
+DOCKER_IMAGE = "artifactory.awsmgmt.massmutual.com/daas-swift-docker/swift-alpine-k8s:aws-docker-1.0.3"
 // Docker container arguments when docker runs
 DOCKER_ARGS = "-u root -v '/var/run/docker.sock:/var/run/docker.sock:rw' " 
 
