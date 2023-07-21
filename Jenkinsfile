@@ -1,4 +1,4 @@
-@Library('swift-libs@5.0.1') _
+@Library('swift-libs@5.1.0') _
 import lib.Slack
 import lib.JenkinsUtilities
 
@@ -122,12 +122,24 @@ pipeline
                                 env.VAULT_KEY   = yaml_data.vault.vault_key
                                 utils.printBold("Fetching secrets from Legacy Vault") 
                             }
+                            if (yaml_data.vault.containsKey("vault_credential_id")){
+                                env.VAULT_CREDENTIAL_ID = yaml_data.vault.vault_credential_id
+                            }
+                            else {
+                                env.VAULT_CREDENTIAL_ID = "saas_vault"
+                            }
                         } 
                         else {
                             echo "Vault Parameters are not correct"
                             exit 1
                         }
                         env.CI_STATUS = 'SUCCESS'
+                        if (yaml_data.artifactory.containsKey("artifactory_url")){
+                            env.ARTIFACTORY_URL = yaml_data.artifactory.artifactory_url
+                        }
+                        else {
+                            env.ARTIFACTORY_URL = "artifactory.awsmgmt.massmutual.com"
+                        }
                         }
                     }
                 }                
