@@ -5,8 +5,8 @@ version: v3.0.0
 application-attributes:
 
   escalation-email: "CloudPlatformEngineering@massmutual.onmicrosoft.com"
-  app-group: "cpe-swift"
-  app: "Swift-template-reactjs-app"
+  app-group: "cpe"
+  app: "template-reactjs-app"
   component: "template-reactjs-app"
   type: "web"
   sdlc-phase: "active"
@@ -35,7 +35,7 @@ organization-attributes:
 # tags required for all cloud resources
 cloud-tags:
 
-  appid: "Swift-template-reactjs-app"
+  appid: "template-reactjs-app"
   app: ""
   tcode: "T-07427-001"
   support-owner: "CloudPlatformEngineering@massmutual.onmicrosoft.com"
