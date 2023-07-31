@@ -1,4 +1,4 @@
-FROM artifactory.awsmgmt.massmutual.com/docker/node:18alpine-v1.0.0 as base
+FROM artifactory.awsmgmt.massmutual.com/docker/node:18alpine-v2.1.0 as base
 # ----------------------Mandatory Configuration start------------------------------------
 # configure npm
 ADD https://artifactory.awsmgmt.massmutual.com/artifactory/mm-certificates/mm-cert-bundle.pem.unix \
