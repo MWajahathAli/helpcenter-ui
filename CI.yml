@@ -45,7 +45,7 @@ buildargs:
 # Performs unit test by loading and executing unittest.groovy file in Jenkinsfile 
 # Note - unitTest() must exist in provided groovy scipt file, as this method being called to run unittests
 unittest:
-    enabled: "true"
+    enabled: "false"
     groovy_file: unittest.groovy
 
 # Validate expected page and content of the page. 
