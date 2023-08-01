@@ -1,10 +1,10 @@
 FROM artifactory.awsmgmt.massmutual.com/docker/node:18alpine-v2.1.0 as base
 # ----------------------Mandatory Configuration start------------------------------------
 # configure npm
-ADD https://artifactory.awsmgmt.massmutual.com/artifactory/mm-certificates/mm-cert-bundle.pem.unix \
-    /usr/local/share/ca-certificates/mm-cert-bundle.pem
-RUN npm config set cafile /usr/local/share/ca-certificates/mm-cert-bundle.pem && \
-    npm config set registry https://artifactory.awsmgmt.massmutual.com/artifactory/api/npm/npm-virtual/
+# ADD https://artifactory.awsmgmt.massmutual.com/artifactory/mm-certificates/mm-cert-bundle.pem.unix \
+#     /usr/local/share/ca-certificates/mm-cert-bundle.pem
+# RUN npm config set cafile /usr/local/share/ca-certificates/mm-cert-bundle.pem && \
+#     npm config set registry https://artifactory.awsmgmt.massmutual.com/artifactory/api/npm/npm-virtual/
 # ----------------------Mandatory Configuration end------------------------------------
 WORKDIR /app
 # install dependencies
