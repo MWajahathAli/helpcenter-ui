@@ -27,6 +27,7 @@ FROM scratch AS export-test-results
 COPY --from=unittest /app/*.xml .
 
 FROM base as prod
+RUN npm install
 RUN npm ci --production --verbose
 # compile react app in build/ directory
 RUN npm run build
