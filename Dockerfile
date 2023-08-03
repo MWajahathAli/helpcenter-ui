@@ -1,10 +1,10 @@
-FROM artifactory.awsmgmt.massmutual.com/docker/node:18alpine-v1.0.0 as base
+FROM artifactory.awsmgmt.massmutual.com/docker/node:18alpine-v2.1.0 as base
 # ----------------------Mandatory Configuration start------------------------------------
 # configure npm
-ADD https://artifactory.awsmgmt.massmutual.com/artifactory/mm-certificates/mm-cert-bundle.pem.unix \
-    /usr/local/share/ca-certificates/mm-cert-bundle.pem
-RUN npm config set cafile /usr/local/share/ca-certificates/mm-cert-bundle.pem && \
-    npm config set registry https://artifactory.awsmgmt.massmutual.com/artifactory/api/npm/npm-virtual/
+# ADD https://artifactory.awsmgmt.massmutual.com/artifactory/mm-certificates/mm-cert-bundle.pem.unix \
+#     /usr/local/share/ca-certificates/mm-cert-bundle.pem
+# RUN npm config set cafile /usr/local/share/ca-certificates/mm-cert-bundle.pem && \
+#     npm config set registry https://artifactory.awsmgmt.massmutual.com/artifactory/api/npm/npm-virtual/
 # ----------------------Mandatory Configuration end------------------------------------
 WORKDIR /app
 # install dependencies
@@ -27,19 +27,20 @@ FROM scratch AS export-test-results
 COPY --from=unittest /app/*.xml .
 
 FROM base as prod
+RUN npm install
 RUN npm ci --production --verbose
 # compile react app in build/ directory
 RUN npm run build
 
 # start final build stage with blank node.js image
-FROM artifactory.awsmgmt.massmutual.com/docker/node:18alpine-v1.0.0
+FROM artifactory.awsmgmt.massmutual.com/docker/node:18alpine-v2.1.0
 RUN apk add --update curl && \
     rm -rf /var/cache/apk/*
 # set up massmutual certs
-ADD https://artifactory.awsmgmt.massmutual.com/artifactory/mm-certificates/mm-cert-bundle.pem.unix \
-    /usr/local/share/ca-certificates/mm-cert-bundle.pem
-RUN npm config set cafile /usr/local/share/ca-certificates/mm-cert-bundle.pem && \
-    npm config set registry https://artifactory.awsmgmt.massmutual.com/artifactory/api/npm/npm-virtual/
+# ADD https://artifactory.awsmgmt.massmutual.com/artifactory/mm-certificates/mm-cert-bundle.pem.unix \
+#     /usr/local/share/ca-certificates/mm-cert-bundle.pem
+# RUN npm config set cafile /usr/local/share/ca-certificates/mm-cert-bundle.pem && \
+#     npm config set registry https://artifactory.awsmgmt.massmutual.com/artifactory/api/npm/npm-virtual/
 
 ## Install `tini` as a process manager
 # RUN cd -- /opt || exit 1 && \
