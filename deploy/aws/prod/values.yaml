@@ -191,3 +191,10 @@ env:
     #   key:
     #     - envName1
     #     - envName2
+# If cronjob is enabled
+# Cronjob deploys under same namespace and schedules cron runs below command
+# <<kubectl rollout restart deployment <deployment-name>>
+# This will trigger a rolling update of the specified deployment. Kubernetes will create new pods with the updated configuration, one at a time, to avoid downtime
+cronjob:
+  enabled: false
+  crontab: "11 * * * *"
