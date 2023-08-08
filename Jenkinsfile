@@ -42,7 +42,7 @@ pipeline
         //Enable chart required credentials to download helm charts
         HELM_CHART_PRIVATE = 'true'
         HELM_CHART_APP = "mmkubeapps"
-        HELM_CHART_VERSION = "0.1.36"
+        HELM_CHART_VERSION = "0.1.40"
         NODE_EXTRA_CA_CERTS = '/root/.pki/tls-ca-bundle.pem'
         ORG = 'massmutual'
         //Validate Params
@@ -470,6 +470,30 @@ pipeline
         // Clean after build
         always {
             cleanWs()
+            dir("${env.WORKSPACE}@tmp") {
+            deleteDir()
+            }
+            dir("${env.WORKSPACE}@script") {
+            deleteDir()
+            }
+            dir("${env.WORKSPACE}@script@tmp") {
+            deleteDir()
+            }
+            dir("${env.WORKSPACE}@libs") {
+            deleteDir()
+            }
+            dir("${env.WORKSPACE}@2") {
+            deleteDir()
+            }
+            dir("${env.WORKSPACE}@2@tmp") {
+            deleteDir()
+            }
+            dir("${env.WORKSPACE}@3") {
+            deleteDir()
+            }
+            dir("${env.WORKSPACE}@3@tmp") {
+            deleteDir()
+            }
            }
         } 
 
