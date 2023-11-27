@@ -42,7 +42,7 @@ pipeline
         //Enable chart required credentials to download helm charts
         HELM_CHART_PRIVATE = 'true'
         HELM_CHART_APP = "mmkubeapps"
-        HELM_CHART_VERSION = "0.1.43"
+        HELM_CHART_VERSION = "0.1.45"
         NODE_EXTRA_CA_CERTS = '/root/.pki/tls-ca-bundle.pem'
         ORG = 'massmutual'
         //Validate Params
