@@ -1,4 +1,4 @@
-@Library('swift-libs@5.3.0') _
+@Library('swift-libs@5.4.0') _
 import lib.Slack
 import lib.JenkinsUtilities
 
