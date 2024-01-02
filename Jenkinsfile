@@ -1,4 +1,4 @@
-@Library('swift-libs@5.4.0') _
+@Library('swift-libs@5.5.0') _
 import lib.Slack
 import lib.JenkinsUtilities
 
@@ -56,6 +56,25 @@ pipeline
 
     // Stages begin here configured each stage for specific task
     stages {
+       stage("Determine github org"){
+            steps{
+                script {
+                    timestamps {                                      
+                        ansiColor {
+                            if ( "${GIT_REPO}" ==~ /.*.com\/massmutual\/.*/ ) {
+                                utils.printBold("Using massmutual github org")
+                                env.GIT_TOKEN = 'swiftci'
+                            }
+                            else if ( "${GIT_REPO}" ==~ /.*.com\/massmutual-git\/.*/ ) {
+                                utils.printBold("Using massmutual-git github org")
+                                env.GIT_TOKEN = 'swiftci_emu'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+   
         //Checkout App Build Repo and Load CI.YML & initiliaze env variables
         stage('Read environment specific values'){
             steps {
@@ -63,7 +82,7 @@ pipeline
                 $class: 'GitSCM',
                 branches: [[name: BRANCH_NAME]],
                 extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: BUILD_FOLDER]],
-                userRemoteConfigs: [[url: GIT_REPO, credentialsId: 'swiftci']]
+                userRemoteConfigs: [[url: GIT_REPO, credentialsId: GIT_TOKEN]]
                 ])
 
                 script {
@@ -393,7 +412,7 @@ pipeline
                 $class: 'GitSCM',
                 branches: [[name: BRANCH_NAME]],
                 extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: BUILD_FOLDER]],
-                userRemoteConfigs: [[url: GIT_REPO, credentialsId: 'swiftci']]
+                userRemoteConfigs: [[url: GIT_REPO, credentialsId: GIT_TOKEN]]
                 ])
                  script {
                     timestamps {                                      
