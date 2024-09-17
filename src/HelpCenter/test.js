@@ -8,16 +8,9 @@ import {
   AccordionSummary,
   AccordionDetails,
   IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  styled,
   Fab,
   Drawer,
-  MenuItem,
-  Paper,
-  MenuList,
+  styled,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -25,16 +18,14 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import { Chat } from "@mui/icons-material";
 import { iconMap, iconColorMap } from "../Helper/Helper";
-import { fetchCategories, handleVote } from "./HelpCenterApi";
+import { handleVote } from "./HelpCenterApi";
 import Close from "@mui/icons-material/Close";
 import SupportAgent from "@mui/icons-material/SupportAgent";
-import Footer from "./Footer";
 
-const HelpCenter = () => {
-  const [categories, setCategories] = useState([]);
+const HelpCenter = ({ categories }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedQuestion, setExpandedQuestion] = useState(null);
-  const [expandedCategories, setExpandedCategories] = useState([]);
+  const [expandedQuestions, setExpandedQuestions] = useState({});
+  const [expandedCategory, setExpandedCategory] = useState(null);
   const [filteredCategories, setFilteredCategories] = useState(categories);
   const [topQuestions, setTopQuestions] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -46,7 +37,6 @@ const HelpCenter = () => {
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
-      //   setFilteredCategories(categories);
       calculateTopQuestions();
     } else {
       const filtered = searchQuestions(categories, searchQuery);
@@ -55,16 +45,6 @@ const HelpCenter = () => {
       setTopQuestions(filtered);
     }
   }, [searchQuery, categories]);
-
-  useEffect(() => {
-    const getCategories = async () => {
-      const data = await fetchCategories();
-      setCategories(data);
-      console.log("Data", data);
-    };
-    getCategories();
-    console.log(categories);
-  }, []);
 
   const searchQuestions = (categories, searchQuery) => {
     let results = [];
@@ -96,7 +76,6 @@ const HelpCenter = () => {
 
   const calculateTopQuestions = () => {
     let all = allQuestions(categories);
-
     const sortedQuestions = all.sort(
       (a, b) => b.yesCount - b.noCount - (a.yesCount - a.noCount)
     );
@@ -104,36 +83,24 @@ const HelpCenter = () => {
   };
 
   const handleCategoryClick = (category) => {
+    const categoryId = category.categoryId;
     setSearchQuery("");
     setSelectedQuestion(null);
-    setExpandedQuestion(null);
-    setSelectedCategory(category.categoryId);
-
-    if (
-      category.questionsAndAnswers.length > 0 ||
-      category?.subcategories?.length > 0
-    ) {
-      setFilteredCategories([category]);
-    } else {
-      setFilteredCategories([]);
-    }
-  };
-
-  const handleCategoryExpand = (categoryId) => {
-    setExpandedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
+    setSelectedCategory(categoryId);
+    // setFilteredCategories([category]);
+    setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
 
   const handleQuestionClick = (questionId) => {
-    setExpandedQuestion(expandedQuestion === questionId ? null : questionId);
+    setExpandedQuestions((prev) => ({
+      ...prev,
+      [questionId]: !prev[questionId],
+    }));
     setFilteredQuestions([]);
   };
+
   const handleSearchQuestionClick = (question) => {
     setSelectedQuestion(question);
-    setExpandedQuestion(null);
     setFilteredQuestions([]);
     setSearchQuery("");
   };
@@ -160,7 +127,6 @@ const HelpCenter = () => {
   const handleVoteRecord = async (questionId, vote) => {
     console.log(questionId, vote);
     const response = await handleVote(questionId, vote);
-    console.log(response);
     if (response.status === 200) {
       setVoteRecorded(true);
       setTimeout(() => {
@@ -183,119 +149,30 @@ const HelpCenter = () => {
   }, []);
 
   const renderCategories = (categories) => {
-    console.log(JSON.stringify(categories));
-
-    return categories.map((category) => {
-      const isSubCategory = category.parentCategory !== 0;
-
-      const isExpanded = expandedCategories.includes(category.categoryId);
-      return (
-        <Box
-          key={category.categoryId}
-          sx={{
-            marginTop: 2,
-            border: "1px solid #ccc",
-            padding: 3,
-            paddingRight: 1.5,
-            paddingLeft: 1.5,
-            borderRadius: 5,
-          }}
+    return categories.map((category) => (
+      <Accordion
+        key={category.categoryId}
+        expanded={expandedCategory === category.categoryId}
+        onChange={() => handleCategoryClick(category)}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls={`panel${category.categoryId}-content`}
+          id={`panel${category.categoryId}-header`}
         >
-          {" "}
-          {!isSubCategory ? (
-            <Box>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold" }}>
-                {category.categoryName}
-              </Typography>
-              {/* <Typography variant="h6" gutterBottom>
-                {category.categoryDescription}
-              </Typography>
-               */}
-              
-              {/* {category.subcategories && category.subcategories.length > 0 && (
-                <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
-                  subcategories
-                </Typography>
-              )} */}
+          <Typography>{category.categoryName}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {category.questionsAndAnswers.map((qa) => (
+            <Box key={qa.id} sx={{ marginBottom: 2 }}>
+              <Typography variant="subtitle1">{qa.question}</Typography>
+              <Typography variant="body2">{qa.answer}</Typography>
             </Box>
-          ) : (
-            <Accordion
-              expanded={isExpanded}
-              onChange={() => handleCategoryExpand(category.categoryId)}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls={`panel${category.categoryId}-content`}
-                id={`panel${category.categoryId}-header`}
-              >
-                {" "}
-                <Typography variant="h6" gutterBottom>
-                  {" "}
-                  {category.categoryName}{" "}
-                </Typography>{" "}
-              </AccordionSummary>{" "}
-              <AccordionDetails>
-                {category?.questionsAndAnswers &&
-                  category?.questionsAndAnswers.map((qa) => (
-                    <Accordion
-                      key={qa.id}
-                      expanded={expandedQuestion === qa.id}
-                      onChange={() => handleQuestionClick(qa.id)}
-                    >
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls={`panel${qa.id}-content`}
-                        id={`panel${qa.id}-header`}
-                      >
-                        <Typography sx={{ fontWeight: "bold" }}>
-                          {qa.question}
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Typography>{qa.answer}</Typography>
-                        <Box
-                          sx={{
-                            paddingTop: 1,
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            mt: 2,
-                            borderTop: "1px solid #ccc",
-                          }}
-                        >
-                          <Typography variant="body1">
-                            Was this helpful?
-                          </Typography>
-                          <Box>
-                            <IconButton
-                              color="primary"
-                              onClick={() => handleVoteRecord(qa.id, "yes")}
-                            >
-                              <ThumbUpIcon />
-                            </IconButton>
-                            <IconButton
-                              color="secondary"
-                              onClick={() => handleVoteRecord(qa.id, "no")}
-                            >
-                              <ThumbDownIcon />
-                            </IconButton>
-                          </Box>
-                        </Box>
-                        {voteRecorded && (
-                          <Typography sx={{ color: "green", mt: 2 }}>
-                            Response recorded. Thank you!
-                          </Typography>
-                        )}
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
-              </AccordionDetails>
-            </Accordion>
-          )}
-          {renderCategories(category.subcategories)}
-        </Box>
-      );
-    });
+          ))}
+          {category.subcategories && renderCategories(category.subcategories)}
+        </AccordionDetails>
+      </Accordion>
+    ));
   };
 
   const ChatIconButton = styled(Fab)(({ theme }) => ({
@@ -314,19 +191,17 @@ const HelpCenter = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            height: "99vh",
+            height: "100vh",
             boxSizing: "border-box",
-            padding: 1,
-            overflowY: "hidden",
+            padding: 2,
           }}
-          width={600}
+          width={500}
         >
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              overflowY: "hidden",
             }}
           >
             <Box sx={{ display: "flex" }}>
@@ -341,6 +216,7 @@ const HelpCenter = () => {
               sx={{ cursor: "pointer" }}
             />
           </Box>
+
           <TextField
             variant="outlined"
             fullWidth
@@ -360,28 +236,12 @@ const HelpCenter = () => {
               },
             }}
           />
-          {/* {filteredQuestions.length > 0 && (
-            <Paper
-              sx={{ maxHeight: 200, overflow: "auto", marginBottom: 2 }}
-              ref={dropdownRef}
-            >
-              <MenuList>
-                {filteredQuestions.map((qa) => (
-                  <MenuItem
-                    key={qa.id}
-                    onClick={() => handleSearchQuestionClick(qa)}
-                  >
-                    {qa.question}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Paper>
-          )} */}
+
           <Box
             sx={{
               display: "flex",
               flexWrap: "wrap",
-              justifyContent: "space-evenly",
+              justifyContent: "space-between",
               flexShrink: 0,
             }}
           >
@@ -404,63 +264,17 @@ const HelpCenter = () => {
                 }}
               >
                 <IconComponent icon={category.icon} />
-
                 <Typography variant="body1">{category.categoryName}</Typography>
               </Box>
             ))}
           </Box>
-          {/* {selectedQuestion && (
-            <Box
-              key={selectedQuestion.id}
-              sx={{
-                marginTop: 2,
-                border: "1px solid #ccc",
-                padding: 3,
-                borderRadius: 5,
-              }}
-            >
-              <Typography variant="h5">{selectedQuestion.question}</Typography>
 
-              <Typography variant="h6">{selectedQuestion.answer}</Typography>
-              <Box
-                sx={{
-                  paddingTop: 1,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mt: 2,
-                  borderTop: "1px solid #ccc",
-                }}
-              >
-                <Typography variant="body1">Was this helpful?</Typography>
-                <Box>
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleVoteRecord(selectedQuestion.id, "yes")}
-                  >
-                    <ThumbUpIcon />
-                  </IconButton>
-                  <IconButton
-                    color="secondary"
-                    onClick={() => handleVoteRecord(selectedQuestion.id, "no")}
-                  >
-                    <ThumbDownIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-              {voteRecorded && (
-                <Typography sx={{ color: "green", mt: 2 }}>
-                  Response recorded. Thank you!
-                </Typography>
-              )}
-            </Box>
-          )} */}
           <Box
             sx={{
               flex: 1,
               overflowY: "auto",
-              paddingRight: 1,
-              paddingLeft: 1,
+              paddingRight: 2,
+              paddingLeft: 2,
               marginBottom: "10px",
             }}
           >
@@ -476,7 +290,7 @@ const HelpCenter = () => {
                   {topQuestions.map((qa) => (
                     <Accordion
                       key={qa.id}
-                      expanded={expandedQuestion === qa.id}
+                      expanded={!!expandedQuestions[qa.id]}
                       onChange={() => handleQuestionClick(qa.id)}
                     >
                       <AccordionSummary
@@ -484,9 +298,7 @@ const HelpCenter = () => {
                         aria-controls={`panel${qa.id}-content`}
                         id={`panel${qa.id}-header`}
                       >
-                        <Typography sx={{ fontWeight: "bold" }}>
-                          {qa.question}
-                        </Typography>
+                        <Typography>{qa.question}</Typography>
                       </AccordionSummary>
                       <AccordionDetails>
                         <Typography>{qa.answer}</Typography>
@@ -539,22 +351,12 @@ const HelpCenter = () => {
             bottom: 0,
             backgroundColor: "#fff",
             padding: 2,
-            boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
+            boxShadow: "0px -2px 10px rgba(0,0,0,0.1)",
           }}
         >
-          {selectedCategory && selectedCategory === 1 ? (
-            <Typography>
-              Need more help? Contact HR Help at workday@massmutual.com
-            </Typography>
-          ) : selectedCategory === 2 ? (
-            <Typography>
-              Need more help? Contact HR Help at onboarding@massmutual.com
-            </Typography>
-          ) : (
-            <Typography>
-              Need more help? Contact HR Help at mmgbsiindia@massmutual.com
-            </Typography>
-          )}
+          <Typography>
+            Need more help? Contact HR Help at +123-456-789
+          </Typography>
         </Box>
       </Drawer>
     </>
@@ -562,3 +364,5 @@ const HelpCenter = () => {
 };
 
 export default HelpCenter;
+
+
